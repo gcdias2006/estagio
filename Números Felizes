@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Número Premiado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+        .content {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 50px;
+            margin-top: 50px;
+            border-radius: 10px;
+        }
+        .input-container {
+            margin: 20px;
+        }
+        .input-container input {
+            padding: 10px;
+            font-size: 16px;
+        }
+        .input-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="content">
+        <h1>Boa sorte</h1>
+        <div class="input-container">
+            <input type="number" id="user-number" placeholder="Digite o seu número">
+            <button onclick="checkNumber()">Verificar</button>
+        </div>
+        <p id="message" class="message"></p>
+    </div>
+
+    <script>
+        const winningNumbers = [
+            5644, 8924, 5488, 11024, 8584, 4016, 7675, 1916, 17752, 11462,
+            10520, 9751, 6328, 1356, 18924, 5964, 786, 14341, 10610, 9977,
+            12287, 17763, 11559, 10883, 8970, 10586, 4879, 13207, 1283, 18883,
+            34, 8953, 4094, 12576, 16498, 2751, 14532, 18453, 454, 18746, 443,
+            8160, 5586, 10254, 11543, 1232, 315, 19861, 13476, 10438, 3144, 1769,
+            9648, 14579, 3234, 1827, 17166, 19884, 12822, 3714
+        ];
+
+        const prizeMessages = {
+            5644: 'Você ganhou um carro novo!',
+            8924: 'Parabéns! Você ganhou uma viagem para a Europa!',
+            5488: 'Você ganhou um smartphone novo!',
+            11024: 'Parabéns! Você ganhou um jantar para dois em um restaurante de luxo!',
+            8584: 'Você ganhou um vale-compras de $500!',
+            4016: 'Parabéns! Você ganhou uma bicicleta nova!',
+            7675: 'Você ganhou um ingresso para um show!',
+            1916: 'Parabéns! Você ganhou um tablet!',
+            17752: 'Você ganhou um notebook novo!',
+            11462: 'Parabéns! Você ganhou uma câmera digital!',
+            10520: 'Você ganhou uma televisão nova!',
+            9751: 'Parabéns! Você ganhou um final de semana em um resort!',
+            6328: 'Você ganhou um relógio de luxo!',
+            1356: 'Parabéns! Você ganhou um curso online!',
+            18924: 'Você ganhou um ano de assinatura em um serviço de streaming!',
+            5964: 'Parabéns! Você ganhou um par de fones de ouvido!',
+            786: 'Você ganhou um dia de spa!',
+            14341: 'Parabéns! Você ganhou um vale-presente de $200!',
+            10610: 'Você ganhou uma cafeteira!',
+            9977: 'Parabéns! Você ganhou um kit de cozinha!',
+            12287: 'Você ganhou uma cadeira de escritório ergonômica!',
+            17763: 'Parabéns! Você ganhou uma bicicleta elétrica!',
+            11559: 'Você ganhou um console de videogame!',
+            10883: 'Parabéns! Você ganhou uma máquina de café expresso!',
+            8970: 'Você ganhou um jantar para dois!',
+            10586: 'Parabéns! Você ganhou um kit de ferramentas!',
+            4879: 'Você ganhou um curso de culinária!',
+            13207: 'Parabéns! Você ganhou uma viagem de cruzeiro!',
+            1283: 'Você ganhou um ingresso para um jogo de futebol!',
+            18883: 'Parabéns! Você ganhou um smartphone!',
+            34: 'Você ganhou um vale-presente de $100!',
+            8953: 'Parabéns! Você ganhou uma noite em um hotel de luxo!',
+            4094: 'Você ganhou um par de ingressos para o cinema!',
+            12576: 'Parabéns! Você ganhou uma assinatura de revista!',
+            16498: 'Você ganhou um ano de academia!',
+            2751: 'Parabéns! Você ganhou um par de tênis!',
+            14532: 'Você ganhou um patinete elétrico!',
+            18453: 'Parabéns! Você ganhou um tablet!',
+            454: 'Você ganhou um vale-compras de $50!',
+            18746: 'Parabéns! Você ganhou um fim de semana em uma pousada!',
+            443: 'Você ganhou um curso de idiomas!',
+            8160: 'Parabéns! Você ganhou uma mochila!',
+            5586: 'Você ganhou uma câmera instantânea!',
+            10254: 'Parabéns! Você ganhou um aparelho de som!',
+            11543: 'Você ganhou um relógio inteligente!',
+            1232: 'Parabéns! Você ganhou um secador de cabelo!',
+            315: 'Você ganhou uma garrafa térmica!',
+            19861: 'Parabéns! Você ganhou um curso de fotografia!',
+            13476: 'Você ganhou uma geladeira!',
+            10438: 'Parabéns! Você ganhou uma máquina de lavar roupa!',
+            3144: 'Você ganhou um aspirador de pó!',
+            1769: 'Parabéns! Você ganhou um liquidificador!',
+            9648: 'Você ganhou um forno elétrico!',
+            14579: 'Parabéns! Você ganhou uma churrasqueira portátil!',
+            3234: 'Você ganhou um vale-compras de $150!',
+            1827: 'Parabéns! Você ganhou um ingresso para um parque temático!',
+            17166: 'Você ganhou uma cafeteira!',
+            19884: 'Parabéns! Você ganhou uma fritadeira elétrica!',
+            12822: 'Você ganhou um purificador de água!',
+            3714: 'Parabéns! Você ganhou um micro-ondas!'
+        };
+
+        let chosenNumbers = [];
+
+        function checkNumber() {
+            const userNumber = parseInt(document.getElementById('user-number').value, 10);
+            const messageElement = document.getElementById('message');
+
+            if (isNaN(userNumber)) {
+                messageElement.textContent = 'Por favor, insira um número válido.';
+                messageElement.style.color = 'orange';
+                return;
+            }
+
+            if (userNumber > 20000) {
+                messageElement.textContent = 'Esse número não está na lista.';
+                messageElement.style.color = 'orange';
+                return;
+            }
+
+            if (chosenNumbers.includes(userNumber)) {
+                messageElement.textContent = 'Este número já foi escolhido. Tente outro.';
+                messageElement.style.color = 'blue';
+                return;
+            }
+
+            if (winningNumbers.includes(userNumber)) {
+                chosenNumbers.push(userNumber);
+                messageElement.textContent = prizeMessages[userNumber];
+                messageElement.style.color = 'green';
+                // Confeti e fogos de artifício
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                confetti({
+                    particleCount: 100,
+                    spread: 120,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                messageElement.textContent = 'Tente de novo!';
+                messageElement.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>
